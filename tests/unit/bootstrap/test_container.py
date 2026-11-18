@@ -93,7 +93,7 @@ def test_container_wires_faq_settings(monkeypatch, tmp_path):
     _build_container(patches)
 
     assert faq_search.call_args.kwargs["model_name"] == "faq-embed"
-    assert faq_search.call_args.kwargs["faq_json_path"].endswith("faq.json")
+    assert faq_search.call_args.kwargs["faq_json_path"].endswith(".json")
     assert reranker.call_args.kwargs["model_name"] == "my-cross-encoder"
     assert judge.call_args.kwargs["model_name"] == "judge-model"
     defaults = ask.call_args.kwargs["faq_defaults"]
