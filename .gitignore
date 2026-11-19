@@ -30,4 +30,5 @@ chroma_data/
 Thumbs.db
 
 # Local documentation
-README_infos_localhost.md
+docs/
+logs/

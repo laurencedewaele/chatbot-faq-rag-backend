@@ -1,4 +1,3 @@
-import os
 import time
 import uuid
 from typing import List, Sequence
@@ -81,6 +80,7 @@ class AskQuestionService(AskQuestionUseCase):
                 "faq_similarity_threshold": faq_params.similarity_threshold,
                 "faq_accept_threshold": faq_params.accept_threshold,
                 "faq_judge_threshold": faq_params.judge_threshold,
+                "api_url": command.api_url,
             },
             trace_name=command.trace_name,
             user_id=command.user_id,
@@ -103,6 +103,7 @@ class AskQuestionService(AskQuestionUseCase):
                     input={"query": command.question},
                     output={"answer": answer, "source": source.value},
                     status_message="SUCCESS",
+                    metadata={"api_url": command.api_url},
                 )
                 trace_handle.score({
                     "total_latency": ScoreInput(name="total_latency", value=float(round(time.perf_counter() - start_total, 2))),
@@ -112,7 +113,12 @@ class AskQuestionService(AskQuestionUseCase):
             return self._build_result(answer, chunks, source, outcome, trace_handle)
         except Exception as exc:
             if trace_handle is not None:
-                trace_handle.update(input={"query": command.question}, output=str(exc), status_message="ERROR")
+                trace_handle.update(
+                    input={"query": command.question},
+                    output=str(exc),
+                    status_message="ERROR",
+                    metadata={"api_url": command.api_url},
+                )
             raise
         finally:
             if trace_handle is not None:
@@ -241,7 +247,7 @@ class AskQuestionService(AskQuestionUseCase):
                         "mmr_lambda": str(lambda_mult) if command.use_mmr else None,
                         "reranker_name": None,
                         "similarity_threshold": str(command.similarity_threshold) if command.similarity_threshold is not None else None,
-                        "retrieval_api_url": os.getenv("API_URL"),
+                        "api_url": command.api_url,
                     },
                 )
                 retrieval_handle.score({

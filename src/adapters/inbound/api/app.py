@@ -20,6 +20,19 @@ from src.adapters.inbound.api.schemas import (
 )
 
 
+def _first_header(request: Request, name: str) -> str | None:
+    # A proxy chain may send "a, b": the first value is the one seen by the client.
+    value = request.headers.get(name)
+    return value.split(",")[0].strip() if value else None
+
+
+def _public_url(request: Request) -> str:
+    """URL of the endpoint as seen by the client, even behind a reverse proxy."""
+    scheme = _first_header(request, "x-forwarded-proto") or request.url.scheme
+    host = _first_header(request, "x-forwarded-host") or request.headers.get("host") or request.url.netloc
+    return f"{scheme}://{host}{request.url.path}"
+
+
 def create_app(container=None) -> FastAPI:
     """Build the FastAPI app.
 
@@ -111,6 +124,7 @@ def create_app(container=None) -> FastAPI:
     @app.post("/api/v1/ask", response_model=AskQuestionResponse)
     async def ask_question(
         payload: AskQuestionRequest,
+        request: Request,
         container=Depends(get_container),
     ) -> AskQuestionResponse:
         try:
@@ -126,6 +140,7 @@ def create_app(container=None) -> FastAPI:
                 faq_similarity_threshold=payload.faq_similarity_threshold,
                 faq_accept_threshold=payload.faq_accept_threshold,
                 faq_judge_threshold=payload.faq_judge_threshold,
+                api_url=_public_url(request),
             )
             result = await run_in_threadpool(
                 container.ask_question.execute,

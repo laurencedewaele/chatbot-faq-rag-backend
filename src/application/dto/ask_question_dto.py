@@ -26,6 +26,8 @@ class AskQuestionCommand:
     faq_similarity_threshold: Optional[float] = None
     faq_accept_threshold: Optional[float] = None
     faq_judge_threshold: Optional[float] = None
+    # Public URL of the API endpoint that received the request (for tracing)
+    api_url: Optional[str] = None
 
 
 @dataclass(frozen=True)

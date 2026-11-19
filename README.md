@@ -118,7 +118,7 @@ curl -X POST http://localhost:7860/api/v1/ask \
 
 ## Lancement en local
 
-Prérequis : Python 3.11, une clé `GOOGLE_API_KEY` et un token `API_HF_TOKEN` donnant accès au dataset Chroma.
+Prérequis : Python 3.12, une clé `GOOGLE_API_KEY` et un token `API_HF_TOKEN` donnant accès au dataset Chroma.
 
 ```bash
 python -m venv .venv
