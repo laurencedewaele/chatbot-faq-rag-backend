@@ -38,7 +38,7 @@ class FaqSettings:
             similarity_threshold=float(os.getenv("FAQ_SIMILARITY_THRESHOLD", "0.85")),
             accept_threshold=float(os.getenv("FAQ_ACCEPT_THRESHOLD", "0.96")),
             judge_threshold=float(os.getenv("FAQ_JUDGE_THRESHOLD", "0.60")),
-            judge_model_name=os.getenv("JUDGE_MODEL_NAME", "gemini-2.5-flash"),
+            judge_model_name=os.getenv("JUDGE_MODEL_NAME", "gemini-3.5-flash-lite"),
             judge_temperature=float(os.getenv("JUDGE_TEMPERATURE", "0.0")),
             judge_thinking_budget=int(os.getenv("JUDGE_THINKING_BUDGET", "0")),
             judge_max_output_tokens=int(os.getenv("JUDGE_MAX_OUTPUT_TOKENS", "256")),

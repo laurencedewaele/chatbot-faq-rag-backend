@@ -1,11 +1,11 @@
 ---
-title: FAQ RAG Backend API
+title: Got Chatbot Backend
 emoji: 💬
-colorFrom: blue
-colorTo: green
+colorFrom: purple
+colorTo: purple
 sdk: docker
-app_port: 7860
-pinned: false
+pinned: true
+short_description: Backend du chatbot FAQ-RAG
 ---
 
 # faq-rag-backend-api

@@ -25,7 +25,7 @@ class GeminiJudgeAdapter(AnswerJudgePort):
 
     def __init__(
         self,
-        model_name: str = "gemini-2.5-flash",
+        model_name: str = "gemini-3.5-flash-lite",
         temperature: float = 0.0,
         thinking_budget: int = 0,
         max_output_tokens: int = 256,

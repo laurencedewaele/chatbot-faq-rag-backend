@@ -14,7 +14,7 @@ from src.domain.model.rag_models import Document, GenerationResult
 
 class GeminiLlmAdapter(LlmPort):
     def __init__(self, prompt_builder: PromptBuilderPort, model_name: str | None = None) -> None:
-        self._model_name = model_name or os.getenv("MODEL_NAME", "gemini-2.5-flash")
+        self._model_name = model_name or os.getenv("MODEL_NAME", "gemini-3.5-flash-lite")
         self._prompt_builder = prompt_builder
         self._client = genai.Client()
         self._temperature = float(os.getenv("LLM_TEMPERATURE", "0.1"))

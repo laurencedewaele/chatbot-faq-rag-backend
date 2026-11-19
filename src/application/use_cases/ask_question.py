@@ -23,7 +23,7 @@ from src.domain.model.rag_models import Document, GenerationResult
 
 
 MODEL_PRICING_PER_1K = {
-    "gemini-2.5-flash": {"input": 0.0003, "output": 0.0025},
+    "gemini-3.5-flash-lite": {"input": 0.0003, "output": 0.0025},
     "Qwen/Qwen2.5-3B-Instruct": {"input": 0.0, "output": 0.0},
 }
 
