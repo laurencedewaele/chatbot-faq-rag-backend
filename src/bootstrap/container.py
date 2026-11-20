@@ -9,6 +9,7 @@ from src.adapters.outbound.embeddings.huggingface_embedding_adapter import Huggi
 from src.adapters.outbound.evaluation.noop_evaluation_adapter import NoOpEvaluationAdapter
 from src.adapters.outbound.evaluation.ragas_evaluation_adapter import RagasEvaluationAdapter
 from src.adapters.outbound.faq.chroma_faq_search_adapter import ChromaFaqSearchAdapter
+from src.adapters.outbound.faq.json_faq_catalog_adapter import JsonFaqCatalogAdapter
 from src.adapters.outbound.llm.gemini_judge_adapter import GeminiJudgeAdapter
 from src.adapters.outbound.llm.gemini_llm_adapter import GeminiLlmAdapter
 from src.adapters.outbound.llm.rag_prompt_builder_adapter import RagPromptBuilderAdapter
@@ -18,6 +19,7 @@ from src.adapters.outbound.reranker.cross_encoder_reranker_adapter import CrossE
 from src.adapters.outbound.vectorstore.chroma_retrieval_adapter import NativeRetrievalAdapter
 from src.application.services.faq_lookup import FaqLookupService
 from src.application.use_cases.ask_question import AskQuestionService
+from src.application.use_cases.list_faq import ListFaqService
 from src.application.use_cases.submit_feedback import SubmitFeedbackService
 from src.config.default_answer import DEFAULT_ANSWER
 from src.config.settings import FaqSettings
@@ -83,6 +85,9 @@ class Container:
             evaluation_port=evaluation,
         )
         self.submit_feedback = SubmitFeedbackService(observability_port=observability)
+        self.list_faq = ListFaqService(
+            faq_catalog_port=JsonFaqCatalogAdapter(faq_json_path=faq_settings.faq_json_path)
+        )
 
     def _build_observability_adapter(self):
         if os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"):

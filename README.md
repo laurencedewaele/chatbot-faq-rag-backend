@@ -73,11 +73,11 @@ tests/               Tests unitaires et de contrat
 | Couche | Fichiers principaux |
 |---|---|
 | Domaine | [faq_models.py](src/domain/model/faq_models.py) (`FaqCandidate`, `JudgeVerdict`, `decide_faq_route`), [rag_models.py](src/domain/model/rag_models.py), [feedback_models.py](src/domain/model/feedback_models.py), [evaluation_models.py](src/domain/model/evaluation_models.py) |
-| Cas d'usage | [ask_question.py](src/application/use_cases/ask_question.py) (orchestration FAQ → RAG), [submit_feedback.py](src/application/use_cases/submit_feedback.py) |
+| Cas d'usage | [ask_question.py](src/application/use_cases/ask_question.py) (orchestration FAQ → RAG), [submit_feedback.py](src/application/use_cases/submit_feedback.py), [list_faq.py](src/application/use_cases/list_faq.py) (contenu de la FAQ) |
 | Services | [faq_lookup.py](src/application/services/faq_lookup.py) (recherche, rerank et juge FAQ) |
-| Ports sortants | [ports/outbound/](src/application/ports/outbound/) : FAQ, reranker, juge, retrieval, embeddings, LLM, prompt, observabilité, évaluation |
+| Ports sortants | [ports/outbound/](src/application/ports/outbound/) : FAQ (recherche et catalogue), reranker, juge, retrieval, embeddings, LLM, prompt, observabilité, évaluation |
 | Adaptateur entrant | [app.py](src/adapters/inbound/api/app.py) (FastAPI), [schemas.py](src/adapters/inbound/api/schemas.py) |
-| Adaptateurs sortants | [chroma_faq_search_adapter.py](src/adapters/outbound/faq/chroma_faq_search_adapter.py), [cross_encoder_reranker_adapter.py](src/adapters/outbound/reranker/cross_encoder_reranker_adapter.py), [gemini_judge_adapter.py](src/adapters/outbound/llm/gemini_judge_adapter.py), [gemini_llm_adapter.py](src/adapters/outbound/llm/gemini_llm_adapter.py), [chroma_retrieval_adapter.py](src/adapters/outbound/vectorstore/chroma_retrieval_adapter.py), [langfuse_observability_adapter.py](src/adapters/outbound/observability/langfuse_observability_adapter.py), [ragas_evaluation_adapter.py](src/adapters/outbound/evaluation/ragas_evaluation_adapter.py) |
+| Adaptateurs sortants | [chroma_faq_search_adapter.py](src/adapters/outbound/faq/chroma_faq_search_adapter.py), [json_faq_catalog_adapter.py](src/adapters/outbound/faq/json_faq_catalog_adapter.py), [cross_encoder_reranker_adapter.py](src/adapters/outbound/reranker/cross_encoder_reranker_adapter.py), [gemini_judge_adapter.py](src/adapters/outbound/llm/gemini_judge_adapter.py), [gemini_llm_adapter.py](src/adapters/outbound/llm/gemini_llm_adapter.py), [chroma_retrieval_adapter.py](src/adapters/outbound/vectorstore/chroma_retrieval_adapter.py), [langfuse_observability_adapter.py](src/adapters/outbound/observability/langfuse_observability_adapter.py), [ragas_evaluation_adapter.py](src/adapters/outbound/evaluation/ragas_evaluation_adapter.py) |
 | Assemblage | [container.py](src/bootstrap/container.py) |
 | Configuration | [settings.py](src/config/settings.py) (`FaqSettings`), [prompt_gemini.py](src/config/prompt_gemini.py), [prompt_judge.py](src/config/prompt_judge.py), [default_answer.py](src/config/default_answer.py) |
 
@@ -106,6 +106,7 @@ Endpoints :
   - Paramètres FAQ, optionnels (sinon valeurs par défaut du serveur) : `faq_top_k`, `faq_similarity_threshold`, `faq_accept_threshold`, `faq_judge_threshold`. Si `faq_judge_threshold` est supérieur à `faq_accept_threshold`, l'API renvoie 400.
   - Réponse : `answer`, `source` (`faq` / `faq_judged` / `rag`), `chunks` (vide si la réponse vient de la FAQ), `faq_best_score`, `faq_candidates`, `judge` (`is_answering`, `reason`, ou `null` si le juge n'a pas été appelé), `trace_id`.
 - `POST /api/v1/feedback` : envoie un feedback sur une réponse (`trace_id`, `score_value`, `feedback_type`, `comment`).
+- `GET /api/v1/faq` : contenu de la FAQ, un élément par thème activé, dans l'ordre du fichier. Réponse : `count` (nombre de thèmes) et `intents` (`intent_key`, `category`, `canonical_question`, `utterances`, `response`). Le fichier est lu une fois au démarrage.
 - `GET /health` : état du service et nombre de formulations FAQ indexées (`faq_count`).
 
 Exemple :

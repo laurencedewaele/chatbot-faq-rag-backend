@@ -34,6 +34,8 @@ def _patched(**overrides):
         "FaqLookupService": dict(return_value=SimpleNamespace()),
         "AskQuestionService": dict(return_value=SimpleNamespace()),
         "SubmitFeedbackService": dict(return_value=SimpleNamespace()),
+        "JsonFaqCatalogAdapter": dict(return_value=SimpleNamespace()),
+        "ListFaqService": dict(return_value=SimpleNamespace()),
         "LoggingObservabilityAdapter": dict(return_value=SimpleNamespace()),
         "LangfuseObservabilityAdapter": dict(return_value=SimpleNamespace()),
         "RagasEvaluationAdapter": dict(return_value=SimpleNamespace()),
@@ -84,7 +86,9 @@ def test_container_wires_faq_settings(monkeypatch, tmp_path):
     reranker = MagicMock()
     judge = MagicMock()
     ask = MagicMock()
+    catalog = MagicMock()
     patches = _patched(
+        JsonFaqCatalogAdapter=dict(new=catalog),
         ChromaFaqSearchAdapter=dict(new=faq_search),
         CrossEncoderRerankerAdapter=dict(new=reranker),
         GeminiJudgeAdapter=dict(new=judge),
@@ -94,6 +98,7 @@ def test_container_wires_faq_settings(monkeypatch, tmp_path):
 
     assert faq_search.call_args.kwargs["model_name"] == "faq-embed"
     assert faq_search.call_args.kwargs["faq_json_path"].endswith(".json")
+    assert catalog.call_args.kwargs["faq_json_path"] == faq_search.call_args.kwargs["faq_json_path"]
     assert reranker.call_args.kwargs["model_name"] == "my-cross-encoder"
     assert judge.call_args.kwargs["model_name"] == "judge-model"
     defaults = ask.call_args.kwargs["faq_defaults"]

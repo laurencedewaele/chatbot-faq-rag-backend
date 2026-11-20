@@ -50,3 +50,14 @@ class AskQuestionResponse(BaseModel):
     faq_candidates: list[FaqCandidateResponse] = Field(default_factory=list)
     judge: JudgeResponse | None = None
     trace_id: str | None
+
+class FaqIntentResponse(BaseModel):
+    intent_key: str
+    category: str | None
+    canonical_question: str | None
+    utterances: list[str]
+    response: str
+
+class FaqListResponse(BaseModel):
+    count: int = Field(..., description="Nombre de thèmes (intents) de la FAQ.")
+    intents: list[FaqIntentResponse]

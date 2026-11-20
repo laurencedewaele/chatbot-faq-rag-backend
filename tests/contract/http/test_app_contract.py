@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from src.adapters.inbound.api.app import create_app
 from src.application.dto.ask_question_dto import AskQuestionResult, FaqCandidateView, JudgeView
+from src.application.dto.faq_catalog_dto import FaqIntentView, ListFaqResult
 from src.domain.errors.exceptions import InvalidThresholdsError
 
 
@@ -40,6 +41,21 @@ class FakeSubmitFeedbackService:
         return FakeSubmitFeedbackResult()
 
 
+class FakeListFaqService:
+    def __init__(self):
+        self.error = None
+
+    def execute(self):
+        if self.error is not None:
+            raise self.error
+        return ListFaqResult(intents=[
+            FaqIntentView(intent_key="k1", category="Cat", canonical_question="Canon ?",
+                          utterances=["U1", "U2"], response="R1"),
+            FaqIntentView(intent_key="k2", category=None, canonical_question=None,
+                          utterances=["U3"], response="R2"),
+        ])
+
+
 class FakeFaqSearch:
     def count(self):
         return 42
@@ -50,6 +66,7 @@ class FakeContainer:
         self.ask_question = FakeAskQuestionService()
         self.submit_feedback = FakeSubmitFeedbackService()
         self.faq_search = FakeFaqSearch()
+        self.list_faq = FakeListFaqService()
 
 
 class AppContractTests(unittest.TestCase):
@@ -112,6 +129,28 @@ class AppContractTests(unittest.TestCase):
         response = self.client.post("/api/v1/ask", json={"question": "Hello?", "faq_accept_threshold": 1.5})
 
         self.assertEqual(response.status_code, 422)
+
+    def test_faq_endpoint_lists_intents(self):
+        response = self.client.get("/api/v1/faq")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
+            "count": 2,
+            "intents": [
+                {"intent_key": "k1", "category": "Cat", "canonical_question": "Canon ?",
+                 "utterances": ["U1", "U2"], "response": "R1"},
+                {"intent_key": "k2", "category": None, "canonical_question": None,
+                 "utterances": ["U3"], "response": "R2"},
+            ],
+        })
+
+    def test_faq_endpoint_returns_500_on_failure(self):
+        self.container.list_faq.error = RuntimeError("boom")
+
+        response = self.client.get("/api/v1/faq")
+
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json(), {"error": "boom"})
 
     def test_feedback_endpoint_returns_ok(self):
         response = self.client.post(

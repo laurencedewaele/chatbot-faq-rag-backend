@@ -16,6 +16,8 @@ from src.adapters.inbound.api.schemas import (
     AskQuestionResponse,
     ChunkResponse,
     FaqCandidateResponse,
+    FaqIntentResponse,
+    FaqListResponse,
     JudgeResponse,
 )
 
@@ -120,6 +122,27 @@ def create_app(container=None) -> FastAPI:
         if faq_search is not None:
             payload["faq_count"] = faq_search.count()
         return payload
+
+    @app.get("/api/v1/faq", response_model=FaqListResponse)
+    def list_faq(container=Depends(get_container)) -> FaqListResponse:
+        try:
+            result = container.list_faq.execute()
+            return FaqListResponse(
+                count=len(result.intents),
+                intents=[
+                    FaqIntentResponse(
+                        intent_key=intent.intent_key,
+                        category=intent.category,
+                        canonical_question=intent.canonical_question,
+                        utterances=intent.utterances,
+                        response=intent.response,
+                    )
+                    for intent in result.intents
+                ],
+            )
+        except Exception as exc:
+            logger.exception("list_faq_failure")
+            return JSONResponse(status_code=500, content={"error": str(exc)})
 
     @app.post("/api/v1/ask", response_model=AskQuestionResponse)
     async def ask_question(

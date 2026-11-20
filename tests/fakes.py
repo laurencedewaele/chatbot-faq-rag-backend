@@ -32,6 +32,14 @@ class FakeFaqSearchPort:
         return "fake-embed"
 
 
+class FakeFaqCatalogPort:
+    def __init__(self, intents):
+        self.intents = list(intents)
+
+    def list_intents(self):
+        return list(self.intents)
+
+
 class FakeRerankerPort:
     """Assigns the scores given per theme and sorts, like the real adapter."""
 

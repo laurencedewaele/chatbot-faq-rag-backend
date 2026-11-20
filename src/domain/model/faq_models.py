@@ -15,6 +15,24 @@ class FaqEntry:
 
 
 @dataclass(frozen=True)
+class FaqIntent:
+    """One FAQ theme as authored in the source file: its question variants and its answer."""
+
+    intent_key: str
+    response: str
+    utterances: tuple[str, ...]
+    category: Optional[str] = None
+    canonical_question: Optional[str] = None
+
+    def formulations(self) -> list[str]:
+        """Utterances, plus the canonical question when it is not already one of them."""
+        formulations = list(self.utterances)
+        if self.canonical_question and self.canonical_question not in formulations:
+            formulations.append(self.canonical_question)
+        return formulations
+
+
+@dataclass(frozen=True)
 class FaqCandidate:
     """A FAQ entry retrieved for a question, with its retrieval and rerank scores."""
 
