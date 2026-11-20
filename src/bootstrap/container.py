@@ -1,6 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import os
+import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -39,11 +40,14 @@ class Container:
             encoding="utf-8"
         )
 
-        # 2. Configuration globale via basicConfig
+        # 2. Configuration globale via basicConfig : fichier + console
+        # (la console est indispensable sur Hugging Face Spaces, où seul stdout/stderr est visible)
+        # force=True : basicConfig ne fait rien si une librairie importée a déjà configuré le root logger
         logging.basicConfig(
             level=logging.INFO,
             format="%(asctime)s - %(name)s - [%(levelname)s] - %(message)s",
-            handlers=[handler]
+            handlers=[handler, logging.StreamHandler(sys.stdout)],
+            force=True,
         )
 
         faq_settings = FaqSettings.from_env()
