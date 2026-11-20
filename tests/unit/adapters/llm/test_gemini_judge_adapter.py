@@ -36,6 +36,26 @@ class GeminiJudgeAdapterTests(unittest.TestCase):
         self.assertEqual(config.response_mime_type, "application/json")
         self.assertEqual(config.temperature, 0.0)
 
+    def test_gemini3_uses_thinking_level(self):
+        adapter, models = build(SimpleNamespace(parsed=JudgeOutput(is_answering=True, reason="ok"), text=None),
+                                model_name="gemini-3.5-flash-lite", thinking_level="low")
+
+        adapter.judge("q", "fq", "fa")
+
+        thinking = models.calls[0][2].thinking_config
+        self.assertEqual(str(thinking.thinking_level.value).lower(), "low")
+        self.assertIsNone(thinking.thinking_budget)
+
+    def test_gemini25_uses_thinking_budget(self):
+        adapter, models = build(SimpleNamespace(parsed=JudgeOutput(is_answering=True, reason="ok"), text=None),
+                                model_name="gemini-2.5-flash", thinking_budget=0)
+
+        adapter.judge("q", "fq", "fa")
+
+        thinking = models.calls[0][2].thinking_config
+        self.assertEqual(thinking.thinking_budget, 0)
+        self.assertIsNone(thinking.thinking_level)
+
     def test_falls_back_to_json_text(self):
         adapter, _ = build(SimpleNamespace(parsed=None, text='{"is_answering": false, "reason": "hors sujet"}'))
 

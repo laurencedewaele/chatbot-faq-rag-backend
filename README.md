@@ -229,10 +229,11 @@ Le fichier [.env.example](.env.example) liste les variables avec des valeurs pr�
 
 | Variable | Défaut | Usage |
 |---|---|---|
-| `JUDGE_MODEL_NAME` | `gemini-2.5-flash` | Modèle du juge. Il utilise la même clé `GOOGLE_API_KEY` que la génération. |
+| `JUDGE_MODEL_NAME` | `gemini-3.5-flash-lite` | Modèle du juge. Il utilise la même clé `GOOGLE_API_KEY` que la génération. |
 | `JUDGE_TEMPERATURE` | `0.0` | Température du juge. |
-| `JUDGE_THINKING_BUDGET` | `0` | Budget de « réflexion » du juge. |
-| `JUDGE_MAX_OUTPUT_TOKENS` | `256` | Tokens maximum pour la réponse JSON `{is_answering, reason}`. |
+| `JUDGE_THINKING_LEVEL` | `minimal` | Niveau de « réflexion » du juge, utilisé pour les modèles `gemini-3*` (`minimal`, `low`, `medium`, `high`). |
+| `JUDGE_THINKING_BUDGET` | `0` | Budget de « réflexion » du juge en tokens, utilisé seulement pour les modèles antérieurs à Gemini 3 (`0` = désactivée). Les modèles Gemini 3 rejettent `0` avec une erreur 400. |
+| `JUDGE_MAX_OUTPUT_TOKENS` | `512` | Tokens maximum pour la réponse JSON `{is_answering, reason}`. |
 
 ### Observabilité (Langfuse)
 

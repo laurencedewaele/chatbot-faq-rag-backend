@@ -26,6 +26,7 @@ class FaqSettings:
     judge_model_name: str
     judge_temperature: float
     judge_thinking_budget: int
+    judge_thinking_level: str
     judge_max_output_tokens: int
 
     @classmethod
@@ -41,7 +42,8 @@ class FaqSettings:
             judge_model_name=os.getenv("JUDGE_MODEL_NAME", "gemini-3.5-flash-lite"),
             judge_temperature=float(os.getenv("JUDGE_TEMPERATURE", "0.0")),
             judge_thinking_budget=int(os.getenv("JUDGE_THINKING_BUDGET", "0")),
-            judge_max_output_tokens=int(os.getenv("JUDGE_MAX_OUTPUT_TOKENS", "256")),
+            judge_thinking_level=os.getenv("JUDGE_THINKING_LEVEL", "minimal"),
+            judge_max_output_tokens=int(os.getenv("JUDGE_MAX_OUTPUT_TOKENS", "512")),
         )
 
     def lookup_defaults(self) -> FaqLookupParams:

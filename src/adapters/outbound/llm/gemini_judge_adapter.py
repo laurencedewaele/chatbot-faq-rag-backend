@@ -28,13 +28,15 @@ class GeminiJudgeAdapter(AnswerJudgePort):
         model_name: str = "gemini-3.5-flash-lite",
         temperature: float = 0.0,
         thinking_budget: int = 0,
-        max_output_tokens: int = 256,
+        thinking_level: str = "minimal",
+        max_output_tokens: int = 512,
         seed: int = 42,
         client: Any = None,
     ) -> None:
         self._model_name = model_name
         self._temperature = temperature
         self._thinking_budget = thinking_budget
+        self._thinking_level = thinking_level
         self._max_output_tokens = max_output_tokens
         self._seed = seed
         if client is None:
@@ -53,7 +55,7 @@ class GeminiJudgeAdapter(AnswerJudgePort):
                 system_instruction=JUDGE_SYSTEM_MESSAGE,
                 temperature=self._temperature,
                 max_output_tokens=self._max_output_tokens,
-                thinking_config=types.ThinkingConfig(thinking_budget=self._thinking_budget),
+                thinking_config=self._thinking_config(types),
                 seed=self._seed,
                 response_mime_type="application/json",
                 response_schema=JudgeOutput,
@@ -62,6 +64,12 @@ class GeminiJudgeAdapter(AnswerJudgePort):
         )
         output = self._parse(response)
         return JudgeVerdict(is_answering=output.is_answering, reason=output.reason)
+
+    def _thinking_config(self, types: Any) -> Any:
+        # Gemini 3+ rejects thinking_budget=0 (400 INVALID_ARGUMENT): it uses thinking_level instead.
+        if self._model_name.startswith("gemini-3"):
+            return types.ThinkingConfig(thinking_level=self._thinking_level)
+        return types.ThinkingConfig(thinking_budget=self._thinking_budget)
 
     @staticmethod
     def _parse(response: Any) -> JudgeOutput:

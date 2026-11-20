@@ -70,6 +70,7 @@ class Container:
             model_name=faq_settings.judge_model_name,
             temperature=faq_settings.judge_temperature,
             thinking_budget=faq_settings.judge_thinking_budget,
+            thinking_level=faq_settings.judge_thinking_level,
             max_output_tokens=faq_settings.judge_max_output_tokens,
         )
         faq_lookup = FaqLookupService(
