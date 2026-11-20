@@ -1,4 +1,4 @@
-fastapi==0.109.2
+fastapi==0.115.14  # starlette 0.46: TestClient compatible with httpx 0.28+ (required by google-genai)
 uvicorn[standard]==0.23.2
 python-dotenv==1.2.4
 google-genai==2.8.0
@@ -17,5 +17,5 @@ pyarrow==21.0.0  # pyarrow 22+ requires numpy 2, numpy is pinned to 1.26.4
 openai==2.54.0
 langchain-openai==1.3.2
 pytest==9.2.0
-httpx==0.27.2  # starlette 0.36 TestClient (fastapi 0.109) is incompatible with httpx 0.28+
+httpx==0.28.1  # google-genai 2.8.0 requires httpx>=0.28.1
 pandas==3.0.3
